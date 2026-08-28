@@ -1,0 +1,163 @@
+# =============================================================================
+# CI — defend the claims
+# =============================================================================
+# This repository asserts that certain lines are controls: decontamination,
+# the PII gate, the split invariant, the per-tag regression check, the
+# ownership term in the cost model. An assertion nothing enforces is a comment.
+#
+# So CI runs the tests that fail when a control is removed, runs both no-GPU
+# examples end to end, and checks the training config validator against a
+# deliberately broken config.
+#
+# CI does NOT run a training job. That would need a GPU and would spend money
+# on every push — a bill, not a test.
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Toolkit tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The toolkit has no runtime dependencies, so it should hold across
+        # every supported Python. If it breaks on one, that is a real bug and
+        # not an environment quirk.
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check src/ tests/ examples/ --select E9,F63,F7,F82,F401
+
+      # 130 tests, no GPU, no API key, no network. About two tenths of a
+      # second — which is the argument for why this layer is the one that
+      # should be covered.
+      - name: Tests
+        run: pytest -q
+
+  examples:
+    name: Examples run end to end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -e ".[dev]" pyyaml
+
+      # A README that shows output nobody re-runs is a README that rots.
+      - name: 01 · decision model
+        run: python examples/01-decide/decide.py
+
+      - name: 02 · curation pipeline
+        run: python examples/02-curate-a-dataset/curate_dataset.py
+
+      # The curated dataset is committed, so the run must be reproducible: if
+      # curation output drifts, this diff catches it.
+      - name: Curated dataset is unchanged
+        run: git diff --exit-code examples/02-curate-a-dataset/data/train.curated.jsonl
+
+  training-gates:
+    name: Training script gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # pyyaml only. Deliberately NOT torch/peft/trl — the config validator
+      # and the dataset gate are designed to run without them, and this job
+      # proves that stays true.
+      - name: Install
+        run: pip install -e "." pyyaml
+
+      - name: Script compiles
+        run: python -m compileall -q examples/
+
+      # Each of the three configs asserts a different outcome. Together they
+      # pin the whole gate: a good config on clean data passes, a good config
+      # on dirty data is refused, and a broken config is rejected outright.
+      - name: A curated dataset passes the gate
+        run: |
+          python examples/03-lora-finetune/train_lora.py \
+            --config examples/03-lora-finetune/configs/lora-7b-curated.yaml \
+            --validate-only
+
+      - name: An uncurated dataset is REFUSED
+        run: |
+          set +e
+          python examples/03-lora-finetune/train_lora.py \
+            --config examples/03-lora-finetune/configs/lora-7b.yaml \
+            --validate-only
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "::error::expected exit 2 (dataset refused), got $code"
+            echo "The training script must refuse an uncurated dataset."
+            exit 1
+          fi
+          echo "correctly refused an uncurated dataset"
+
+      - name: A broken config is REJECTED
+        run: |
+          set +e
+          python examples/03-lora-finetune/train_lora.py \
+            --config examples/03-lora-finetune/configs/BROKEN-example.yaml \
+            --validate-only
+          code=$?
+          set -e
+          if [ "$code" -ne 1 ]; then
+            echo "::error::expected exit 1 (config rejected), got $code"
+            exit 1
+          fi
+          echo "correctly rejected a broken config"
+
+  docs:
+    name: Docs links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A broken relative link is the most common way a teaching repo rots.
+      # Cheap to check, tedious to find by hand.
+      - name: Check relative links
+        run: |
+          fail=0
+          while IFS= read -r -d '' file; do
+            dir=$(dirname "$file")
+            while read -r link; do
+              case "$link" in
+                http*|mailto:*|"") continue ;;
+              esac
+              target="$dir/${link%%#*}"
+              if [ ! -e "$target" ]; then
+                echo "BROKEN  $file  ->  $link"
+                fail=1
+              fi
+            done < <(grep -oE '\]\(([^)#:]+)\)' "$file" | sed -E 's/^\]\(//; s/\)$//')
+          done < <(find . -name '*.md' -not -path './.git/*' -print0)
+          exit $fail
