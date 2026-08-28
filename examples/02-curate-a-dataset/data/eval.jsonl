@@ -1,0 +1,3 @@
+{"prompt": "What were the total generation megawatt hours recorded for the third quarter?", "completion": "4,182,000 megawatt hours.", "source": "eval-set-v1"}
+{"prompt": "What is the escalation path for a Category 2 environmental event?", "completion": "Shift supervisor, then environmental duty officer within thirty minutes, then regulatory notification within twenty-four hours.", "source": "eval-set-v1"}
+{"prompt": "Classify this message by urgency: switchyard breaker failed to close on command.", "completion": "urgency: now", "source": "eval-set-v1"}
