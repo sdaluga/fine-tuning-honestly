@@ -1,0 +1,31 @@
+# The same run as lora-7b.yaml, pointed at the CURATED dataset.
+#
+# lora-7b.yaml deliberately points at the raw file so the refusal path can be
+# demonstrated. This one points at what a human signed off after reading the
+# findings — and so it validates clean and would actually train.
+
+base_model: meta-llama/Meta-Llama-3.1-8B-Instruct
+train_file: ../../02-curate-a-dataset/data/train.curated.jsonl
+eval_file: ../../02-curate-a-dataset/data/eval.jsonl
+output_dir: ./output/lora-7b-curated
+
+rank: 16
+alpha: 32
+dropout: 0.05
+target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+learning_rate: 0.0001
+epochs: 3
+batch_size: 4
+grad_accum: 4
+max_seq_len: 2048
+warmup_ratio: 0.03
+load_in_4bit: true
+seed: 42
