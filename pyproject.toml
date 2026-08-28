@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tuning-toolkit"
+version = "0.1.0"
+description = "The parts of a model-tuning project that must be correct whether or not the training run is."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+# No runtime dependencies, deliberately. Every module in src/ is pure stdlib,
+# which is what lets the whole toolkit run in milliseconds on any machine with
+# no GPU, no API key and no network. The training example has its own
+# requirements.txt; it is the only thing here that needs more.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
