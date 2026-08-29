@@ -5,7 +5,7 @@
 # the PII gate, the split invariant, the per-tag regression check, the
 # ownership term in the cost model. An assertion nothing enforces is a comment.
 #
-# So CI runs the tests that fail when a control is removed, runs all three
+# So CI runs the tests that fail when a control is removed, runs all four
 # no-GPU examples end to end, and checks the training config validator against
 # a deliberately broken config.
 #
@@ -80,6 +80,9 @@ jobs:
       # demonstrating.
       - name: 03 · evaluation and the regression gate
         run: python examples/03-evaluate/evaluate_a_tune.py
+
+      - name: 05 · distillation
+        run: python examples/05-distill/distill_a_teacher.py
 
       # Both committed artifacts must be reproducible. If curation output or a
       # scored baseline drifts, these diffs catch it.
