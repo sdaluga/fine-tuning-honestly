@@ -39,6 +39,7 @@ pip install -e ".[dev]"
 
 python examples/01-decide/decide.py               # should you tune at all?
 python examples/02-curate-a-dataset/curate_dataset.py   # find what's wrong with the data
+python examples/03-evaluate/evaluate_a_tune.py          # catch what a tune broke
 pytest                                             # 130 tests, ~0.2s
 ```
 
@@ -78,7 +79,7 @@ recommend(Scenario(failure_is_missing_knowledge=True)).rung
 
 ---
 
-## The three examples
+## The four examples
 
 ### 🧭 [01 · Should we tune?](examples/01-decide/) — no GPU
 
@@ -99,12 +100,26 @@ Fourteen plausible-looking operational examples, seeded with every defect this t
 
 None of them announce themselves. Every one of them would train. The run finds all five, **refuses to release the dataset**, and emits a dataset manifest and a model card that lists its own gaps.
 
-### 🔧 [03 · The actual LoRA fine-tune](examples/03-lora-finetune/) — needs a GPU
+### 📊 [03 · Evaluate a tune](examples/03-evaluate/) — no GPU
+
+A tune that improved exactly what it was asked to improve and destroyed something else on the way past. **The headline number does not move at all:**
+
+```
+                    baseline    after tuning
+  extraction          0.700  →     1.000     ▲ +0.300
+  refusal             1.000  →     0.250     ▼ −0.750
+  ───────────────────────────────────────────────────
+  MEAN                0.800  →     0.800       UNCHANGED
+```
+
+The aggregate check passes. The per-tag check fails. Two critical cases — a $2.4M contract approval and a prompt injection — regressed from refusal to compliance, and those carry zero tolerance. Same headline gain, opposite shipping decisions.
+
+### 🔧 [04 · The actual LoRA fine-tune](examples/04-lora-finetune/) — needs a GPU
 
 Real `peft` + `trl` code, three configs, and two hard stops: it **will not train on an uncurated dataset**, and it **will not train without a baseline eval**. Not flags you can pass.
 
 ```bash
-python examples/03-lora-finetune/train_lora.py --config configs/lora-7b.yaml --validate-only
+python examples/04-lora-finetune/train_lora.py --config configs/lora-7b.yaml --validate-only
 # config OK — rank 16, alpha 32, lr 0.0001, 3 epochs
 # REFUSING TO TRAIN — the dataset has blocking findings:
 #   [pii:email] email pattern found in example from 'contact-sheet'
@@ -169,7 +184,7 @@ src/tuning_toolkit/
 examples/
 ├── 01-decide/                 four scenarios, four answers        no GPU
 ├── 02-curate-a-dataset/       find five planted defects           no GPU
-└── 03-lora-finetune/          real peft + trl, three configs      GPU
+└── 04-lora-finetune/          real peft + trl, three configs      GPU
 
 docs/
 ├── 01-when-to-tune.md         the ladder and the economics
