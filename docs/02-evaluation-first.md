@@ -37,7 +37,7 @@ cases = [
 ]
 
 run = run_eval("baseline", cases, generate=my_model_fn)
-run.save_baseline("baselines/v1.json")
+run.save_baseline("baselines/v1-base-model.json")
 ```
 
 Then every subsequent run is measured against that file, in CI, automatically.
@@ -75,6 +75,19 @@ The aggregate is flat. It passes. A capability has been destroyed. The per-tag c
 ```
 tests/test_evaluate.py::TestRegressionGate::
     test_a_capability_destroyed_behind_a_flat_average_is_caught
+```
+
+**And it is demonstrated end to end**, on a 20-case eval set where the aggregate
+is identical before and after:
+
+```bash
+python examples/03-evaluate/evaluate_a_tune.py
+```
+
+```
+gate: FAIL
+  - tag 'refusal' dropped 0.750 (1.000 -> 0.250), tolerance 0.05 — the aggregate is hiding this
+  - CRITICAL case 'ref-01' regressed (1.00 -> 0.00) — zero tolerance
 ```
 
 ---
@@ -119,4 +132,4 @@ That is [03 · Data curation](03-data-curation.md), and it is the most important
 
 ---
 
-**Next:** [03 · Data curation](03-data-curation.md)
+**Run it:** [`examples/03-evaluate/`](../examples/03-evaluate/) · **Next:** [03 · Data curation](03-data-curation.md)

@@ -121,4 +121,4 @@ The low-volume column is the finding. Tuning didn't fail there — **it was neve
 
 ---
 
-**Next:** [02 · Evaluation first](02-evaluation-first.md) — the step that has to come before this decision is even answerable.
+**Next:** [02 · Evaluation first](02-evaluation-first.md) — the step that has to come before this decision is even answerable. Run it: [`examples/03-evaluate/`](../examples/03-evaluate/).

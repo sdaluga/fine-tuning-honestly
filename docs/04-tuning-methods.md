@@ -1,6 +1,8 @@
 # 04 · Tuning methods
 
-You've climbed the ladder, the diagnosis is behavioural or economic, the data is curated and the eval is committed. Now — and only now — which method?
+You've climbed the ladder, the diagnosis is behavioural or economic, the data is curated, and the eval is committed with a scored baseline. Now — and only now — which method?
+
+If any of those four is not true, the answer is not on this page. Go back to [01](01-when-to-tune.md), [02](02-evaluation-first.md) or [03](03-data-curation.md).
 
 ---
 
@@ -90,12 +92,12 @@ Prove it before you propose it: show the base model failing on domain terms it s
 
 ```bash
 # validate a config and the dataset — no GPU needed
-python examples/03-lora-finetune/train_lora.py \
-    --config examples/03-lora-finetune/configs/lora-7b.yaml \
+python examples/04-lora-finetune/train_lora.py \
+    --config examples/04-lora-finetune/configs/lora-7b.yaml \
     --validate-only
 ```
 
-Three configs ship:
+Four configs ship (the fourth, `lora-small-fast.yaml`, is for iterating on the data rather than the adapter):
 
 - **`lora-7b.yaml`** — the defensible default. Points at the *raw* dataset, so it demonstrates the refusal path.
 - **`lora-7b-curated.yaml`** — the same run against the reviewed dataset. Validates clean.
