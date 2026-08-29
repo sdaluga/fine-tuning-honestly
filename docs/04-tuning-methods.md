@@ -70,6 +70,15 @@ You are not making a model smarter. You are teaching a small model to imitate a 
 
 This is where the economics in [01](01-when-to-tune.md) actually land, and it is the most common genuine win in enterprise settings.
 
+**It also has a failure mode the other methods don't**, and it is social before it is technical: teacher output gets treated as ground truth because it came from the expensive model. A teacher that is 80% accurate hands you a label set that is 80% accurate, and the student learns the other 20% as *systematic* error.
+
+Two things follow, both demonstrated in [`examples/05-distill/`](../examples/05-distill/):
+
+- **Sample the teacher k times and keep only what it agrees with itself on.** In the worked example that lifts label accuracy 0.800 → 0.941 for one extra inference pass — far cheaper than the tuning run it protects.
+- **Never report student-teacher agreement as the headline.** It measures fidelity, not quality. In the same example the student agrees with its teacher 0.900 and is 0.700 accurate against gold. Score on a held-out set the teacher never labelled, or you don't know whether distillation worked — only that it copied.
+
+A student that perfectly reproduces its labels is exactly as accurate as they are. **Distillation cannot exceed its teacher on the labels it was given**, so when you need better, the lever is better labels rather than more epochs.
+
 ---
 
 ## Preference tuning (DPO)

@@ -121,4 +121,8 @@ Removing flagged rows is a **human** step, and the example shows it as one. That
 
 ---
 
+> **Machine-generated data is not exempt.** Teacher output from a distillation run duplicates, contaminates and leaks PII exactly like human-written data — more so, because it was produced in bulk. Run it through the same pipeline, and tag its `source` so "which rows were machine-labelled" stays a filter rather than an investigation. See [`examples/05-distill/`](../examples/05-distill/).
+
+---
+
 **Next:** [04 · Tuning methods](04-tuning-methods.md)
