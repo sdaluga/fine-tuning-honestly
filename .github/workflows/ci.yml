@@ -5,9 +5,9 @@
 # the PII gate, the split invariant, the per-tag regression check, the
 # ownership term in the cost model. An assertion nothing enforces is a comment.
 #
-# So CI runs the tests that fail when a control is removed, runs both no-GPU
-# examples end to end, and checks the training config validator against a
-# deliberately broken config.
+# So CI runs the tests that fail when a control is removed, runs all three
+# no-GPU examples end to end, and checks the training config validator against
+# a deliberately broken config.
 #
 # CI does NOT run a training job. That would need a GPU and would spend money
 # on every push — a bill, not a test.
@@ -74,10 +74,20 @@ jobs:
       - name: 02 · curation pipeline
         run: python examples/02-curate-a-dataset/curate_dataset.py
 
-      # The curated dataset is committed, so the run must be reproducible: if
-      # curation output drifts, this diff catches it.
+      # This one asserts its own premise on the way out: that the aggregate is
+      # unchanged, the narrow tune is blocked, the good tune is not, and a
+      # critical case failed. It exits non-zero if the demonstration ever stops
+      # demonstrating.
+      - name: 03 · evaluation and the regression gate
+        run: python examples/03-evaluate/evaluate_a_tune.py
+
+      # Both committed artifacts must be reproducible. If curation output or a
+      # scored baseline drifts, these diffs catch it.
       - name: Curated dataset is unchanged
         run: git diff --exit-code examples/02-curate-a-dataset/data/train.curated.jsonl
+
+      - name: Eval baseline is unchanged
+        run: git diff --exit-code examples/03-evaluate/baselines/v1-base-model.json
 
   training-gates:
     name: Training script gates
@@ -103,15 +113,15 @@ jobs:
       # on dirty data is refused, and a broken config is rejected outright.
       - name: A curated dataset passes the gate
         run: |
-          python examples/03-lora-finetune/train_lora.py \
-            --config examples/03-lora-finetune/configs/lora-7b-curated.yaml \
+          python examples/04-lora-finetune/train_lora.py \
+            --config examples/04-lora-finetune/configs/lora-7b-curated.yaml \
             --validate-only
 
       - name: An uncurated dataset is REFUSED
         run: |
           set +e
-          python examples/03-lora-finetune/train_lora.py \
-            --config examples/03-lora-finetune/configs/lora-7b.yaml \
+          python examples/04-lora-finetune/train_lora.py \
+            --config examples/04-lora-finetune/configs/lora-7b.yaml \
             --validate-only
           code=$?
           set -e
@@ -125,8 +135,8 @@ jobs:
       - name: A broken config is REJECTED
         run: |
           set +e
-          python examples/03-lora-finetune/train_lora.py \
-            --config examples/03-lora-finetune/configs/BROKEN-example.yaml \
+          python examples/04-lora-finetune/train_lora.py \
+            --config examples/04-lora-finetune/configs/BROKEN-example.yaml \
             --validate-only
           code=$?
           set -e
