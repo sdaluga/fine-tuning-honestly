@@ -1,0 +1,28 @@
+# A smaller, faster configuration for iterating on the data.
+#
+# Use this while the dataset is still moving. Rank 8 and two epochs train in
+# a fraction of the time, and at this stage you are testing whether the DATA
+# teaches the behaviour — not squeezing the last point out of the adapter.
+
+base_model: Qwen/Qwen2.5-1.5B-Instruct
+train_file: ../../02-curate-a-dataset/data/train.jsonl
+eval_file: ../../02-curate-a-dataset/data/eval.jsonl
+output_dir: ./output/lora-small
+
+rank: 8
+alpha: 16
+dropout: 0.05
+target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+
+learning_rate: 0.0002
+epochs: 2
+batch_size: 8
+grad_accum: 2
+max_seq_len: 1024
+warmup_ratio: 0.03
+load_in_4bit: false
+seed: 42

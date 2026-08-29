@@ -1,0 +1,14 @@
+# A deliberately misconfigured file, kept so the validator has something to
+# catch in CI. Every mistake here is one that has cost somebody a GPU-hour.
+
+base_model: some-base-model
+train_file: ../../02-curate-a-dataset/data/train.jsonl
+eval_file: ../../02-curate-a-dataset/data/eval.jsonl
+output_dir: ./output/broken
+
+rank: 256             # far too high for adaptation — overfits a small set
+alpha: 16             # BELOW rank, which scales the adapter down. A typo.
+dropout: 1.5          # not a probability
+learning_rate: 0.5    # off by three orders of magnitude
+epochs: 40            # memorisation
+target_modules: []    # nothing to adapt
