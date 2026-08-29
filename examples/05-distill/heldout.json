@@ -1,0 +1,15 @@
+{
+  "_comment": "A held-out slice the teacher never labelled for training. Gold is real; teacher and student answers were scored on it separately. This is the ONLY honest measurement of whether distillation worked.",
+  "gold": {
+    "h1": "now", "h2": "today", "h3": "no_action", "h4": "this_week", "h5": "now",
+    "h6": "today", "h7": "no_action", "h8": "this_week", "h9": "now", "h10": "today"
+  },
+  "teacher": {
+    "h1": "now", "h2": "today", "h3": "no_action", "h4": "this_week", "h5": "today",
+    "h6": "today", "h7": "no_action", "h8": "no_action", "h9": "now", "h10": "today"
+  },
+  "student": {
+    "h1": "now", "h2": "today", "h3": "no_action", "h4": "this_week", "h5": "today",
+    "h6": "today", "h7": "no_action", "h8": "no_action", "h9": "now", "h10": "this_week"
+  }
+}

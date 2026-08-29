@@ -1,0 +1,22 @@
+{"prompt": "Classify urgency: switchyard breaker failed to close on command.", "samples": ["now", "now", "now"], "gold": "now"}
+{"prompt": "Classify urgency: transformer oil sample shows elevated dissolved gas.", "samples": ["today", "today", "today"], "gold": "today"}
+{"prompt": "Classify urgency: cafeteria menu for next week.", "samples": ["no_action", "no_action", "no_action"], "gold": "no_action"}
+{"prompt": "Classify urgency: unit 2 tripped offline, cause unknown.", "samples": ["now", "now", "now"], "gold": "now"}
+{"prompt": "Classify urgency: annual ethics training reminder.", "samples": ["no_action", "no_action", "no_action"], "gold": "no_action"}
+{"prompt": "Classify urgency: vendor asking to reschedule next month's site visit.", "samples": ["this_week", "this_week", "this_week"], "gold": "this_week"}
+{"prompt": "Classify urgency: bearing vibration trending up over six weeks.", "samples": ["this_week", "this_week", "today"], "gold": "this_week"}
+{"prompt": "Classify urgency: regulator requests documentation within 24 hours.", "samples": ["today", "today", "now"], "gold": "today"}
+{"prompt": "Classify urgency: spare parts inventory report attached.", "samples": ["no_action", "no_action", "this_week"], "gold": "no_action"}
+{"prompt": "Classify urgency: contractor badge access expires Friday.", "samples": ["this_week", "this_week", "no_action"], "gold": "this_week"}
+{"prompt": "Classify urgency: fire suppression panel showing a supervisory alarm.", "samples": ["today", "now", "now"], "gold": "now"}
+{"prompt": "Classify urgency: minor oil sheen observed near the transformer pad.", "samples": ["today", "today", "now"], "gold": "today"}
+{"prompt": "Classify urgency: quarterly newsletter from the trade association.", "samples": ["no_action", "no_action", "no_action"], "gold": "no_action"}
+{"prompt": "Classify urgency: grid operator requesting confirmation of tomorrow's outage.", "samples": ["today", "today", "today"], "gold": "today"}
+{"prompt": "Classify urgency: employee asking about parking permit renewal.", "samples": ["no_action", "no_action", "no_action"], "gold": "no_action"}
+{"prompt": "Classify urgency: elevated bearing temperature on the main feed pump.", "samples": ["this_week", "today", "now"], "gold": "today"}
+{"prompt": "Classify urgency: intermittent SCADA comms dropout on unit 1.", "samples": ["no_action", "today", "this_week"], "gold": "today"}
+{"prompt": "Classify urgency: audit finding response due end of quarter.", "samples": ["now", "this_week", "no_action"], "gold": "this_week"}
+{"prompt": "Classify urgency: routine calibration certificate filed.", "samples": ["no_action", "no_action", "no_action"], "gold": "no_action"}
+{"prompt": "Classify urgency: contractor reports a near-miss on the turbine deck.", "samples": ["today", "today", "today"], "gold": "now"}
+{"prompt": "Classify urgency: cafeteria menu for next week.", "samples": ["no_action", "no_action", "no_action"]}
+{"prompt": "Draft a callback note for the reported meter fault.", "samples": ["Called the site contact Dana Whitfield at 555-238-1190 to confirm the meter fault.", "Called the site contact Dana Whitfield at 555-238-1190 to confirm the meter fault.", "Called the site contact to confirm the meter fault."]}
