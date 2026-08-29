@@ -1,12 +1,12 @@
-<div align="center">
+![Fine-Tuning, Honestly — evaluate first, curate second, tune last](docs/images/hero.png)
 
-# Fine-Tuning, Honestly
+<div align="center">
 
 ### A working toolkit for the parts of a model-tuning project that must be correct whether or not the training run does — and a straight answer to the question most teams skip: *should you be tuning at all?*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-2EA043?style=for-the-badge)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-130%20·%20mutation--checked-8957E5?style=for-the-badge)](tests/)
+[![Tests](https://img.shields.io/badge/tests-159%20·%20mutation--checked-8957E5?style=for-the-badge)](tests/)
 [![No GPU required](https://img.shields.io/badge/toolkit-no%20GPU%20required-FF6F00?style=for-the-badge)](src/tuning_toolkit/)
 
 **[When to tune](docs/01-when-to-tune.md) · [Evaluation first](docs/02-evaluation-first.md) · [Data curation](docs/03-data-curation.md) · [Methods](docs/04-tuning-methods.md) · [Governance](docs/05-governance.md)**
@@ -26,7 +26,7 @@ So the ratio here is deliberate:
 | | Lines | Needs a GPU | Tested |
 |---|---|---|---|
 | The training script | 344 | yes | config validation only |
-| Everything that has to be right anyway | ~1,500 | **no** | **130 tests, mutation-checked** |
+| Everything that has to be right anyway | ~1,700 | **no** | **159 tests, mutation-checked** |
 
 ---
 
@@ -40,7 +40,8 @@ pip install -e ".[dev]"
 python examples/01-decide/decide.py               # should you tune at all?
 python examples/02-curate-a-dataset/curate_dataset.py   # find what's wrong with the data
 python examples/03-evaluate/evaluate_a_tune.py          # catch what a tune broke
-pytest                                             # 130 tests, ~0.2s
+python examples/05-distill/distill_a_teacher.py         # teacher labels are not gold
+pytest                                             # 159 tests, ~0.3s
 ```
 
 **No GPU. No API key. No network.** The whole toolkit runs on a laptop, and that is the point: the layers that fail silently are exactly the layers that should be cheap to test.
@@ -79,7 +80,7 @@ recommend(Scenario(failure_is_missing_knowledge=True)).rung
 
 ---
 
-## The four examples
+## The five examples
 
 ### 🧭 [01 · Should we tune?](examples/01-decide/) — no GPU
 
@@ -125,6 +126,19 @@ python examples/04-lora-finetune/train_lora.py --config configs/lora-7b.yaml --v
 #   [pii:email] email pattern found in example from 'contact-sheet'
 ```
 
+### 🧪 [05 · Distil a teacher](examples/05-distill/) — no GPU
+
+Teacher output gets treated as ground truth because it came from the expensive model. It isn't.
+
+Sampling the teacher three times and keeping only what it agrees with itself on lifts label accuracy **0.800 → 0.941 for one extra inference pass**. Then the agreement trap:
+
+```
+student agrees with teacher   0.900   <- the flattering number
+STUDENT ACCURACY vs gold      0.700   <- the real one
+```
+
+Agreement measures fidelity, not quality. A student that faithfully copies a teacher which is wrong 20% of the time scores beautifully — and is wrong 20% of the time.
+
 ---
 
 ## Ten things that surprise people
@@ -145,7 +159,7 @@ python examples/04-lora-finetune/train_lora.py --config configs/lora-7b.yaml --v
 ## The tests are the argument
 
 ```bash
-pytest          # 130 tests, ~0.2 seconds, no GPU, no API key
+pytest          # 159 tests, ~0.3 seconds, no GPU, no API key
 ```
 
 Every test is named for the production incident it prevents, because a test called `test_decontaminate_works` tells a future reader nothing about whether it is safe to delete.
@@ -179,6 +193,7 @@ src/tuning_toolkit/
 ├── decision.py      the ladder, the blockers, the cost model      pure · 27 tests
 ├── curate.py        dedup · decontamination · PII · split         pure · 47 tests
 ├── evaluate.py      eval harness + regression gate                pure · 31 tests
+├── distill.py       teacher-label quality · the agreement trap    pure · 29 tests
 └── governance.py    manifests · model cards · reproducibility     pure · 25 tests
 
 examples/
